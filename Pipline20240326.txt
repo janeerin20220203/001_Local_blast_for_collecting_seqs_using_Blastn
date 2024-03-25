@@ -1,0 +1,70 @@
+Local-blast搭建流程
+
+#===================================1-创建文件夹===================================
+mkdir -p /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/ && cd /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/
+
+#切换目标文件所在目录
+
+#===================================2-准备query序列===================================
+
+ && cp /root/data1/kangjieqiong2022/099-NUCLEAR-SEQ/TEST013-Local-BLAST/15-Bubalus_bubalis/ncbi_dataset/data/GCF_019923935.1/GCF_019923935.1_NDDB_SH_1_genomic.fna /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/genome.fna && cp /root/data1/kangjieqiong2022/099-NUCLEAR-SEQ/TEST013-Local-BLAST/15-Bubalus_bubalis/XM_005898658.2.txt /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/query.fas
+
+#复制基因组文件将基因组文件重命名为genome.fna
+#将query序列改名为query.fas
+#此处可以开始整体替换目标文件夹路径
+
+#===================================3-local-balst拼接过程===================================
+
+ && conda activate blast_env && cd /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/ && makeblastdb -in genome.fna -dbtype nucl -out genome_db && blastn -query query.fas -db genome_db -outfmt 6 -out blast_results.txt && cp /root/data1/kangjieqiong2022/099-NUCLEAR-SEQ/TEST013-Local-BLAST/All-local-blast-scripts/*.py /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/ && conda activate base && python 01.py && python 02.py && python 03.py && > 010.fas && head -n 2 query.fas >> 010.fas && head -n 2 009.txt >> 010.fas && mafft --auto 010.fas > 012.fas && python 05.py && python 06.py && sed -n '3,4p' 014.fas > 015-final-seq.fas
+
+"""
+以下步骤为第3步一体化流程
+
+conda activate blast_env
+===============================================
+cd /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/
+
+建库
+makeblastdb -in genome.fna -dbtype nucl -out genome_db && blastn -query query.fas -db genome_db -outfmt 6 -out blast_results.txt
+
+#建库名为genome_db
+================================================
+cp /root/data1/kangjieqiong2022/099-NUCLEAR-SEQ/TEST013-Local-BLAST/All-local-blast-scripts/*.py /root/data1/kangjieqiong2022/000-ForTutorial/Tuto0326-local-balst/18/
+
+#genome_sequence_path = 'GCF_000223135.1_CriGri_1.0_genomic.fas'   需要改一下03.py里的基因组信息
+
+================================================
+conda activate base
+#cd /root/data1/kangjieqiong2022/099-NUCLEAR-SEQ/TEST013-Local-BLAST/02-Microtus_oregoni/04/
+python 01.py&&python 02.py&&python 03.py
+
+=====================bash===========================
+
+#将query.fas文件的第一第二行写入010.fas的第一第二行
+#将009.txt文件的第一第二行写入010.fas的第三第四行，我用的系统是linux系统
+# 清空或创建010.fas文件，以确保从空文件开始
+> 010.fas
+# 将query.fas的前两行追加到010.fas中
+head -n 2 query.fas >> 010.fas
+# 将009.txt的前两行追加到010.fas中
+head -n 2 009.txt >> 010.fas
+
+#合并版
+> 010.fas && head -n 2 query.fas >> 010.fas && head -n 2 009.txt >> 010.fas
+
+
+
+=====================python-bash===========================
+#使用MAFFT在Linux上对010.fas文件进行序列比对，并将比对结果输出到012.fas文件中
+mafft --auto 010.fas > 012.fas
+#将012.fas文件里的序列写在同一行+“-”替换为“N”
+#进行比对之后，将query序列的N删除
+#将最后删除了N的拼接好的序列单独写入一个新的文件015-final-seq.fas
+
+mafft --auto 010.fas > 012.fas && python 05.py && python 06.py && sed -n '3,4p' 014.fas > 015-final-seq.fas
+
+#最后拼接好的序列在015-final-seq.fas文件中
+
+"""
+
+
